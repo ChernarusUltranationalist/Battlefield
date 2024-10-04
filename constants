@@ -1,0 +1,287 @@
+import host
+import string
+from bf2 import g_debug
+
+### Stats
+
+VEHICLE_TYPE_ARMOR 	= 0
+VEHICLE_TYPE_AVIATOR	= 1
+VEHICLE_TYPE_AIRDEFENSE	= 2
+VEHICLE_TYPE_HELICOPTER	= 3
+VEHICLE_TYPE_TRANSPORT	= 4
+VEHICLE_TYPE_ARTILLERY	= 5
+VEHICLE_TYPE_GRNDDEFENSE= 6
+
+VEHICLE_TYPE_PARACHUTE	= 9
+VEHICLE_TYPE_SOLDIER	= 10
+
+NUM_VEHICLE_TYPES 	= 11
+VEHICLE_TYPE_UNKNOWN 	= NUM_VEHICLE_TYPES
+
+
+WEAPON_TYPE_ASSAULT 	= 0
+WEAPON_TYPE_ASSAULTGRN	= 1
+WEAPON_TYPE_CARBINE	= 2
+WEAPON_TYPE_LMG		= 3
+WEAPON_TYPE_SNIPER	= 4
+WEAPON_TYPE_PISTOL	= 5
+WEAPON_TYPE_ATAA	= 6
+WEAPON_TYPE_SMG		= 7
+WEAPON_TYPE_SHOTGUN	= 8
+
+WEAPON_TYPE_KNIFE	= 10
+WEAPON_TYPE_C4		= 11
+WEAPON_TYPE_CLAYMORE	= 12
+WEAPON_TYPE_HANDGRENADE = 13
+WEAPON_TYPE_SHOCKPAD	= 14
+WEAPON_TYPE_ATMINE	= 15
+WEAPON_TYPE_TARGETING	= 16
+
+NUM_WEAPON_TYPES 	= 17
+WEAPON_TYPE_UNKNOWN	= NUM_WEAPON_TYPES
+
+
+KIT_TYPE_AT		= 0
+KIT_TYPE_ASSAULT	= 1
+KIT_TYPE_ENGINEER	= 2
+KIT_TYPE_MEDIC		= 3
+KIT_TYPE_SPECOPS	= 4
+KIT_TYPE_SUPPORT 	= 5
+KIT_TYPE_SNIPER 	= 6
+
+NUM_KIT_TYPES		= 7
+KIT_TYPE_UNKNOWN	= NUM_KIT_TYPES
+
+
+ARMY_USA		= 0
+ARMY_MEC		= 1
+ARMY_CHINESE		= 2
+
+NUM_ARMIES		= 3
+ARMY_UNKNOWN		= NUM_ARMIES
+
+
+vehicleTypeMap = {
+	"usapc_lav25"		: VEHICLE_TYPE_ARMOR,
+	"apc_btr90"		: VEHICLE_TYPE_ARMOR,
+	"apc_wz551"		: VEHICLE_TYPE_ARMOR,
+	"ustnk_m1a2"		: VEHICLE_TYPE_ARMOR,
+	"rutnk_t90"		: VEHICLE_TYPE_ARMOR,
+	"tnk_type98"		: VEHICLE_TYPE_ARMOR,
+	"usair_f18"		: VEHICLE_TYPE_AVIATOR,
+	"ruair_mig29"		: VEHICLE_TYPE_AVIATOR,
+	"air_j10"		: VEHICLE_TYPE_AVIATOR,
+	"usair_f15"		: VEHICLE_TYPE_AVIATOR,
+	"ruair_su34"		: VEHICLE_TYPE_AVIATOR,
+	"air_su30mkk"		: VEHICLE_TYPE_AVIATOR,
+	"air_f35b"		: VEHICLE_TYPE_AVIATOR,
+	"usaav_m6"		: VEHICLE_TYPE_AIRDEFENSE,
+	"aav_tunguska"		: VEHICLE_TYPE_AIRDEFENSE,
+	"aav_type95"		: VEHICLE_TYPE_AIRDEFENSE,
+	"usaas_stinger"		: VEHICLE_TYPE_AIRDEFENSE,
+	"igla_djigit"		: VEHICLE_TYPE_AIRDEFENSE,
+	"wasp_defence_front"	: VEHICLE_TYPE_AIRDEFENSE,
+	"wasp_defence_back"	: VEHICLE_TYPE_AIRDEFENSE,
+	"usthe_uh60"		: VEHICLE_TYPE_HELICOPTER,
+	"the_mi17"		: VEHICLE_TYPE_HELICOPTER,
+	"chthe_z8"		: VEHICLE_TYPE_HELICOPTER,
+	"ahe_ah1z"		: VEHICLE_TYPE_HELICOPTER,
+	"ahe_havoc"		: VEHICLE_TYPE_HELICOPTER,
+	"ahe_z10"		: VEHICLE_TYPE_HELICOPTER,
+	"jeep_faav"		: VEHICLE_TYPE_TRANSPORT,
+	"usjep_hmmwv"		: VEHICLE_TYPE_TRANSPORT,
+	"jep_paratrooper"	: VEHICLE_TYPE_TRANSPORT,
+	"jep_mec_paratrooper"	: VEHICLE_TYPE_TRANSPORT,
+	"jep_vodnik"		: VEHICLE_TYPE_TRANSPORT,
+	"jep_nanjing"		: VEHICLE_TYPE_TRANSPORT,
+	"uslcr_lcac"		: VEHICLE_TYPE_TRANSPORT,
+	"boat_rib"		: VEHICLE_TYPE_TRANSPORT,
+	"usart_lw155"		: VEHICLE_TYPE_ARTILLERY,
+	"ars_d30"		: VEHICLE_TYPE_ARTILLERY,
+	"ats_tow"		: VEHICLE_TYPE_GRNDDEFENSE,
+	"ats_hj8"		: VEHICLE_TYPE_GRNDDEFENSE,
+	"hmg_m2hb"		: VEHICLE_TYPE_GRNDDEFENSE,
+	"chhmg_kord"		: VEHICLE_TYPE_GRNDDEFENSE,
+	"mec_bipod"		: VEHICLE_TYPE_GRNDDEFENSE,
+	"us_bipod"		: VEHICLE_TYPE_GRNDDEFENSE,
+	"ch_bipod"		: VEHICLE_TYPE_GRNDDEFENSE,
+#	"TYPE85"		: VEHICLE_TYPE_GRNDDEFENSE,
+	"us_soldier"		: VEHICLE_TYPE_SOLDIER,
+	"us_heavy_soldier"	: VEHICLE_TYPE_SOLDIER,
+	"us_light_soldier"	: VEHICLE_TYPE_SOLDIER,
+	"mec_soldier"		: VEHICLE_TYPE_SOLDIER,
+	"mec_light_soldier"	: VEHICLE_TYPE_SOLDIER,
+	"mec_heavy_soldier"	: VEHICLE_TYPE_SOLDIER,
+	"ch_soldier"		: VEHICLE_TYPE_SOLDIER,
+	"ch_light_soldier"	: VEHICLE_TYPE_SOLDIER,
+	"ch_heavy_soldier"	: VEHICLE_TYPE_SOLDIER,
+	"parachute"		: VEHICLE_TYPE_PARACHUTE,
+}
+
+weaponTypeMap = {
+	"usrif_m16a2"		: WEAPON_TYPE_ASSAULT,
+	"rurif_ak101"		: WEAPON_TYPE_ASSAULT,
+	"rurif_ak47"		: WEAPON_TYPE_ASSAULT,
+	"usrif_sa80"		: WEAPON_TYPE_ASSAULT,
+	"usrif_g3a3"		: WEAPON_TYPE_ASSAULT,
+	"usrif_m203"		: WEAPON_TYPE_ASSAULT,
+	"rurif_gp30"		: WEAPON_TYPE_ASSAULT,
+	"rurif_gp25"		: WEAPON_TYPE_ASSAULT,
+	"usrgl_m203"		: WEAPON_TYPE_ASSAULTGRN,
+	"rurgl_gp30"		: WEAPON_TYPE_ASSAULTGRN,
+	"rurgl_gp25"		: WEAPON_TYPE_ASSAULTGRN,
+	"rurrif_ak74u"		: WEAPON_TYPE_CARBINE,
+	"usrif_m4"		: WEAPON_TYPE_CARBINE,
+	"rurif_ak74u"		: WEAPON_TYPE_CARBINE,
+	"chrif_type95"		: WEAPON_TYPE_CARBINE,
+	"usrif_g36c"		: WEAPON_TYPE_CARBINE,
+	"uslmg_m249saw"		: WEAPON_TYPE_LMG,
+	"rulmg_rpk74"		: WEAPON_TYPE_LMG,
+	"chlmg_type95"		: WEAPON_TYPE_LMG,
+	"rulmg_pkm"		: WEAPON_TYPE_LMG,
+	"usrif_m24"		: WEAPON_TYPE_SNIPER,
+	"rurif_dragunov"	: WEAPON_TYPE_SNIPER,
+	"chsni_type88"		: WEAPON_TYPE_SNIPER,
+	"ussni_m82a1"		: WEAPON_TYPE_SNIPER,
+	"ussni_m95_barret"	: WEAPON_TYPE_SNIPER,
+	"uspis_92fs"		: WEAPON_TYPE_PISTOL,
+	"uspis_92fs_silencer"	: WEAPON_TYPE_PISTOL,
+	"rupis_baghira"		: WEAPON_TYPE_PISTOL,
+	"rupis_baghira_silencer": WEAPON_TYPE_PISTOL,
+	"chpis_qsz92"		: WEAPON_TYPE_PISTOL,
+	"chpis_qsz92_silencer"	: WEAPON_TYPE_PISTOL,
+	"usatp_predator"	: WEAPON_TYPE_ATAA,
+	"chat_eryx"		: WEAPON_TYPE_ATAA,
+	"usrif_mp5_a3"		: WEAPON_TYPE_SMG,
+	"rurif_bizon"		: WEAPON_TYPE_SMG,
+	"chrif_type85"		: WEAPON_TYPE_SMG,
+	"usrif_remington11-87"	: WEAPON_TYPE_SHOTGUN,
+	"rusht_saiga12"		: WEAPON_TYPE_SHOTGUN,
+	"chsht_norinco982"	: WEAPON_TYPE_SHOTGUN,
+	"chsht_protecta"	: WEAPON_TYPE_SHOTGUN,
+	"ussht_jackhammer"	: WEAPON_TYPE_SHOTGUN,
+	"kni_knife"		: WEAPON_TYPE_KNIFE,
+	"c4_explosives"		: WEAPON_TYPE_C4,
+	"ushgr_m67"		: WEAPON_TYPE_HANDGRENADE,
+	"usmin_claymore"	: WEAPON_TYPE_CLAYMORE,
+	"defibrillator"		: WEAPON_TYPE_SHOCKPAD,
+	"at_mine"		: WEAPON_TYPE_ATMINE,
+	"simrad"		: WEAPON_TYPE_TARGETING
+}
+
+
+kitTypeMap = {
+	"us_at"		: KIT_TYPE_AT,
+	"us_assault"	: KIT_TYPE_ASSAULT,
+	"us_engineer"	: KIT_TYPE_ENGINEER,
+	"us_medic"	: KIT_TYPE_MEDIC,
+	"us_specops"	: KIT_TYPE_SPECOPS,
+	"us_support"	: KIT_TYPE_SUPPORT,
+	"us_sniper"	: KIT_TYPE_SNIPER,
+	"mec_at" 	: KIT_TYPE_AT,
+	"mec_assault"	: KIT_TYPE_ASSAULT,
+	"mec_engineer"	: KIT_TYPE_ENGINEER,
+	"mec_medic"	: KIT_TYPE_MEDIC,
+	"mec_specops"	: KIT_TYPE_SPECOPS,
+	"mec_support"	: KIT_TYPE_SUPPORT,
+	"mec_sniper"	: KIT_TYPE_SNIPER,
+	"ch_at" 	: KIT_TYPE_AT,
+	"ch_assault"	: KIT_TYPE_ASSAULT,
+	"ch_engineer"	: KIT_TYPE_ENGINEER,
+	"ch_medic"	: KIT_TYPE_MEDIC,
+	"ch_specops"	: KIT_TYPE_SPECOPS,
+	"ch_support"	: KIT_TYPE_SUPPORT,
+	"ch_sniper"	: KIT_TYPE_SNIPER
+}
+
+armyMap = {
+	"us"		: ARMY_USA,
+	"mec"		: ARMY_MEC,
+	"ch"		: ARMY_CHINESE
+}
+
+mapMap = {
+	"kubra_dam"		: "0",
+	"mashtuur_city"		: "1",
+	"operation_clean_sweep" : "2",
+	"zatar_wetlands"	: "3",
+	"strike_at_karkand"	: "4",
+	"sharqi_peninsula"	: "5",
+	"gulf_of_oman"		: "6",
+	"daqing_oilfields"	: "100",
+	"dalian_plant"		: "101",
+	"dragon_valley"		: "102",
+	"fushe_pass"		: "103",
+	"hingan_hills"		: "104",
+	"songhua_stalemate"	: "105",
+}
+UNKNOWN_MAP = 99
+
+gameModeMap = {
+	"gpm_cq"		: 0,
+	"gpm_sl"		: 1,
+}
+UNKNOWN_GAMEMODE = 99
+
+
+def getVehicleType(templateName):
+	try:
+		vehicleType = vehicleTypeMap[string.lower(templateName)]
+	except KeyError:
+		#if g_debug: print "Enter: Vehicle %s not registered for stats." % templateName
+		return VEHICLE_TYPE_UNKNOWN
+	
+	return vehicleType
+	
+def getWeaponType(templateName):
+	try:
+		weaponType = weaponTypeMap[string.lower(templateName)]
+	except KeyError:
+		#if g_debug: print "Enter: Weapon %s not registered for stats." % templateName
+		return WEAPON_TYPE_UNKNOWN
+	
+	return weaponType	
+	
+def getKitType(templateName):	
+	try:
+		kitType = kitTypeMap[string.lower(templateName)]
+	except KeyError:
+		#if g_debug: print "Enter: Kit %s not registered for stats." % templateName
+		return KIT_TYPE_UNKNOWN
+	
+	return kitType	
+	
+def getArmy(templateName):
+	try:
+		army = armyMap[string.lower(templateName)]
+	except KeyError:
+		return ARMY_UNKNOWN
+	
+	return army
+
+def getMapId(mapName):
+	try:
+		mapId = mapMap[string.lower(mapName)]
+	except KeyError:
+		return UNKNOWN_MAP
+	
+	return mapId
+
+def getGameModeId(gameMode):
+	try:
+		gameModeId = gameModeMap[string.lower(gameMode)]
+	except KeyError:
+		return UNKNOWN_GAMEMODE
+	
+	return gameModeId
+
+def getRootParent(obj):
+	parent = obj.getParent()
+	
+	if parent == None:
+		return obj
+		
+	return getRootParent(parent)
+
+
+if g_debug: print "Stat constants loaded"
