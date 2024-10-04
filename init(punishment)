@@ -1,0 +1,5 @@
+import autobalance
+import tk_punish
+
+autobalance.init()
+tk_punish.init()	
